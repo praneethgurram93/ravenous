@@ -16,7 +16,7 @@ const SearchBar = () => {
   );
 
   return (
-    <div className="searchBar">
+    <div className="SearchBar">
       <div className="SearchBar-sort-options">
         <ul>
           {renderSortByOptions()}
