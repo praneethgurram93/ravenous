@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import './SearchBar.css';
+import {search} from "../../services/Yelp";
 
-const SearchBar = () => {
+const SearchBar = ({handleSearchResults}) => {
   const [term, setTerm] = useState('');
   const [location, setLocation] = useState('');
   const [sortBy, setSortBy] = useState('best_match');
@@ -20,8 +21,34 @@ const SearchBar = () => {
 
   const handleLocationChange = event => setLocation(event.target.value);
 
-  const searchYelp = () => {
-    console.log('Searching Yelp with Pizza, Brooklyn, best_match');
+  const searchYelp = async () => {
+     try {
+       const response = await search(term, location, sortBy);
+       if (!response.businesses) {
+         throw new Error('response doesn\'t contain key businesses');
+       }
+       const businesses = [];
+
+       response.businesses.forEach(business => {
+         businesses.push({
+           id : business.id,
+           imageSrc: business.image_url,
+           reviewCount: business.review_count,
+           rating: business.rating,
+           category: business.categories[0].title,
+           address: business.location.address1,
+           city: business.location.city,
+           state: business.location.state,
+           zipCode: business.location.zip_code,
+           name: business.name,
+         });
+       });
+
+       // this function call updates BusinessList component
+       handleSearchResults(businesses);
+     } catch (e) {
+       console.log(e);
+     }
   };
 
   const handleSearch = event => {
